@@ -9,7 +9,7 @@ import torch.nn.functional as F
 from Model import VGG
 
 cascade = cv2.CascadeClassifier('lbpcascade_animeface.xml')
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # @UndefinedVariable
 
 chara_list = [] #キャラクター対応表
 with open('file.csv','r') as f:
@@ -50,7 +50,7 @@ if len(faces) > 0:
         image_face = image[y:y+h,x:x+w]
         cv2.rectangle(image,(x,y),(x+w,y+h),(255,255,255),2)
 else:
-    image_face = image 
+    image_face = image
 
 image_face = cv2.resize(image_face, (64, 64))
 image_face = image_face.transpose(2,0,1)
@@ -58,7 +58,7 @@ image_face = torch.Tensor(image_face.reshape(1,3,64,64))
 image_face = image_face.to(device)
 #モデルへ適用
 output = model(image_face)
-par, pred = torch.max(F.softmax(output.data, dim=1), 1)
+par, pred = torch.max(F.softmax(output.data, dim=1), 1)  # @UndefinedVariable
 score, chara = float(par), pred
 print(chara)
 chara_name=''
@@ -81,8 +81,8 @@ print('')
 if len(faces) <= 0:
 	x=5
 	y=-1
-cv2.putText(image, chara_name, (x-5, y+10), 
+cv2.putText(image, chara_name, (x-5, y+10),
     cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 0))
-cv2.putText(image, '('+str(round(score*100, 2))+'%)', (x-5, y+30), 
+cv2.putText(image, '('+str(round(score*100, 2))+'%)', (x-5, y+30),
     cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 0))
 cv2.imwrite('result.png',image)
