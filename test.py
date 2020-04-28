@@ -2,11 +2,16 @@ import csv
 import numpy as np
 import cv2
 import sys
+import os
+import os.path
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from Model import VGG
+
+#コマンドライン引数のリスト取得
+args = sys.argv
 
 cascade = cv2.CascadeClassifier('lbpcascade_animeface.xml')
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -22,8 +27,10 @@ model = VGG(9).to(device)
 param = torch.load("output/model.pth")
 model.load_state_dict(param)
 model.eval()
-FILE_NAME = input("file name : ") #標準入力からファイル名を要求
-print(FILE_NAME)
+#FILE_NAME = input("file name : ") #標準入力からファイル名を要求
+#print(FILE_NAME)
+FILE_NAME = args[1]
+
 image = cv2.imread(FILE_NAME, 1)
 if image is None:
     print('File Name Error!')
@@ -50,7 +57,7 @@ if len(faces) > 0:
         image_face = image[y:y+h,x:x+w]
         cv2.rectangle(image,(x,y),(x+w,y+h),(255,255,255),2)
 else:
-    image_face = image 
+    image_face = image
 
 image_face = cv2.resize(image_face, (64, 64))
 image_face = image_face.transpose(2,0,1)
@@ -77,12 +84,26 @@ print('Recognition : '+str(round(score*100, 2))+'%')
 print('============================')
 print('')
 
+
+
+#画像出力先
+dirname = 'result'
+if not os.path.exists(dirname):
+    os.mkdir(dirname)
+
+#結果をCSVに保存
+with open(dirname + '/result.csv', 'w') as f:
+    basename = os.path.basename(FILE_NAME)
+    writer = csv.writer(f)
+    writer.writerow([basename, chara_name, str(round(score*100, 2))+'%'])
+
 #結果を画像出力
 if len(faces) <= 0:
 	x=5
 	y=-1
-cv2.putText(image, chara_name, (x-5, y+10), 
+cv2.putText(image, chara_name, (x-5, y+10),
     cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 0))
-cv2.putText(image, '('+str(round(score*100, 2))+'%)', (x-5, y+30), 
+cv2.putText(image, '('+str(round(score*100, 2))+'%)', (x-5, y+30),
     cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 0))
-cv2.imwrite('result.png',image)
+cv2.imwrite(os.path.join(dirname, 'result.png'),image)
+
