@@ -13,18 +13,18 @@ from Model import VGG
 #コマンドライン引数のリスト取得
 args = sys.argv
 
-cascade = cv2.CascadeClassifier('lbpcascade_animeface.xml')
+cascade = cv2.CascadeClassifier('/home/syoum/Python/lbpcascade_animeface.xml')
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # @UndefinedVariable
 
 chara_list = [] #キャラクター対応表
-with open('file.csv','r') as f:
+with open('/home/syoum/Python/file.csv','r') as f:
     reader = csv.reader(f)
     for r in reader:
         chara_list.append(r)
 
 #モデルとデータの準備
 model = VGG(9).to(device)
-param = torch.load("output/model.pth")
+param = torch.load("/home/syoum/Python/output/model.pth")
 model.load_state_dict(param)
 model.eval()
 #FILE_NAME = input("file name : ") #標準入力からファイル名を要求
@@ -42,7 +42,7 @@ print('-------------------')
 print(height)
 print(width)
 print('-------------------')
-cascade = cv2.CascadeClassifier('lbpcascade_animeface.xml')
+cascade = cv2.CascadeClassifier('/home/syoum/Python/lbpcascade_animeface.xml')
 print(cascade)
 faces = cascade.detectMultiScale(image,
         scaleFactor = 1.1,
@@ -87,7 +87,7 @@ print('')
 
 
 #画像出力先
-dirname = 'result'
+dirname = '/home/syoum/Python/result'
 if not os.path.exists(dirname):
     os.mkdir(dirname)
 
